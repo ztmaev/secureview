@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,11 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/componentsui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
+  const router = useRouter();
+
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
@@ -48,11 +53,9 @@ export default function SignupPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" />
           </div>
-          <Link href="/dashboard" className="w-full">
-            <Button type="submit" className="w-full">
-              Create an account
-            </Button>
-          </Link>
+          <Button onClick={() => router.push('/dashboard')} type="submit" className="w-full">
+            Create an account
+          </Button>
           <Button variant="outline" className="w-full">
             Sign up with Google
           </Button>

@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,8 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Logo } from '@/components/icons';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
@@ -43,9 +48,9 @@ export default function LoginPage() {
             </div>
             <Input id="password" type="password" required />
           </div>
-          <Link href="/dashboard" className="w-full">
-            <Button className="w-full">Login</Button>
-          </Link>
+          <Button onClick={() => router.push('/dashboard')} className="w-full">
+            Login
+          </Button>
           <Button variant="outline" className="w-full">
             Login with Google
           </Button>
