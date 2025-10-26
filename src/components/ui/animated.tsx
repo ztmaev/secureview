@@ -3,6 +3,8 @@
 import { motion, type Variants } from 'framer-motion';
 import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
+import { Card } from './card';
+import Image from 'next/image';
 
 interface AnimatedProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'fadeIn' | 'slideIn';
@@ -62,7 +64,4 @@ export function Animated({
 }
 
 export const MotionCard = motion(Card);
-import { Card } from './card';
-
 export const MotionImage = motion(Image);
-import Image from 'next/image';
