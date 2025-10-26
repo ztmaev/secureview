@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Twitter, Linkedin, Instagram, Github } from 'lucide-react';
 import Link from 'next/link';
+import { MotionImage } from '@/components/ui/animated';
 
 const socialLinks = [
   { href: '#', icon: Twitter, label: 'Twitter' },
@@ -100,7 +101,16 @@ export default function ProfilePage() {
         <CardContent className="grid md:grid-cols-3 gap-4">
           {projects.map(project => (
             <div key={project.id} className="relative group overflow-hidden rounded-lg">
-                <Image src={project.imageUrl} alt={project.description} width={600} height={400} className="object-cover w-full h-full" data-ai-hint={project.imageHint}/>
+                <MotionImage 
+                    src={project.imageUrl} 
+                    alt={project.description} 
+                    width={600} 
+                    height={400} 
+                    className="object-cover w-full h-full" 
+                    data-ai-hint={project.imageHint}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                />
                 <div className="absolute inset-0 bg-black/50 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-white font-bold">{project.description}</p>
                 </div>
@@ -117,7 +127,16 @@ export default function ProfilePage() {
         <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {media.map(item => (
             <div key={item.id} className="relative aspect-square group overflow-hidden rounded-lg">
-                <Image src={item.imageUrl} alt={item.description} width={400} height={400} className="object-cover w-full h-full" data-ai-hint={item.imageHint}/>
+                <MotionImage 
+                  src={item.imageUrl} 
+                  alt={item.description} 
+                  width={400} 
+                  height={400} 
+                  className="object-cover w-full h-full" 
+                  data-ai-hint={item.imageHint}
+                  whileHover={{ scale: 1.05, filter: 'brightness(0.8)' }}
+                  transition={{ duration: 0.3 }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
                      <p className="text-white text-xs font-semibold truncate">{item.description}</p>
                 </div>
