@@ -11,28 +11,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Link from 'next/link';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 export function UserNav() {
-  const avatar = PlaceHolderImages.find(img => img.id === 'profile-avatar');
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    signOut(auth);
+    router.push('/login');
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            {avatar && <AvatarImage src={avatar.imageUrl} alt="@shadcn" data-ai-hint={avatar.imageHint} />}
-            <AvatarFallback>SV</AvatarFallback>
+            <AvatarImage src={user?.photoURL ?? ''} alt={user?.displayName ?? ''} />
+            <AvatarFallback>{user?.displayName?.charAt(0) ?? user?.email?.charAt(0) ?? 'U'}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Client Name</p>
+            <p className="text-sm font-medium leading-none">{user?.displayName ?? 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              client@example.com
+              {user?.email ?? 'No email'}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -51,11 +60,9 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <Link href="/login">
-            <DropdownMenuItem>
-            Log out
-            </DropdownMenuItem>
-        </Link>
+        <DropdownMenuItem onClick={handleLogout}>
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
