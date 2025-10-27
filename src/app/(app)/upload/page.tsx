@@ -25,6 +25,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ShieldCheck, FileWarning } from 'lucide-react';
 import Image from 'next/image';
+import { useFirebase } from '@/firebase';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection } from 'firebase/firestore';
 
 const formSchema = z.object({
   watermarkText: z
@@ -50,6 +53,7 @@ export default function UploadPage() {
   const [resultUri, setResultUri] = useState<string | null>(null);
   const [originalUri, setOriginalUri] = useState<string | null>(null);
   const { toast } = useToast();
+  const { firestore, user } = useFirebase();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,6 +87,17 @@ export default function UploadPage() {
             description: 'Your media has been protected.',
             variant: 'default',
           });
+
+          if (firestore && user) {
+            const updatesCollection = collection(firestore, 'website_updates');
+            addDocumentNonBlocking(updatesCollection, {
+              eventType: 'new_picture',
+              entityId: 'some-media-id', // Replace with actual ID
+              timestamp: new Date().toISOString(),
+              userProfileId: user.uid,
+            });
+          }
+
         } else {
             throw new Error('AI failed to return watermarked media.');
         }
@@ -155,7 +170,7 @@ export default function UploadPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button type="submit" disabled={isLoading || !firestore} className="w-full">
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

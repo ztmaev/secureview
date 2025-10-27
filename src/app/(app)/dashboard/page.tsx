@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -5,9 +7,12 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { DollarSign, Eye, Users, TrendingUp } from 'lucide-react';
+import { DollarSign, Eye, Users, TrendingUp, Bell } from 'lucide-react';
 import { DashboardChart } from '@/components/dashboard-chart';
 import { Animated } from '@/components/ui/animated';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useMemoFirebase, useFirestore } from '@/firebase/provider';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const kpiData = [
   {
@@ -36,6 +41,49 @@ const kpiData = [
   },
 ];
 
+const eventTypeToHumanReadable: { [key: string]: string } = {
+  new_proposal: 'New Proposal',
+  new_project: 'New Project',
+  new_picture: 'New Picture Uploaded'
+}
+
+function RecentActivity() {
+  const firestore = useFirestore();
+  const updatesQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'website_updates'), orderBy('timestamp', 'desc'), limit(5));
+  }, [firestore]);
+
+  const { data: updates, isLoading, error } = useCollection(updatesQuery);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-headline">Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        {isLoading && <p>Loading activity...</p>}
+        {error && <p className="text-destructive">Error loading activity.</p>}
+        {updates && updates.length === 0 && <p className="text-muted-foreground">No recent activity.</p>}
+        {updates && updates.map((update) => (
+          <div key={update.id} className="flex items-center">
+            <div className="p-2 bg-accent rounded-full mr-4">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">{eventTypeToHumanReadable[update.eventType] || 'New Update'}</p>
+              <p className="text-sm text-muted-foreground">
+                {new Date(update.timestamp).toLocaleTimeString()} - {new Date(update.timestamp).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+
 export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
@@ -61,34 +109,7 @@ export default function DashboardPage() {
             <DashboardChart />
           </div>
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">New Sponsorship Offer</p>
-                    <p className="text-sm text-muted-foreground">From TechCorp</p>
-                  </div>
-                  <div className="ml-auto font-medium text-primary">+$1,999.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Video "Project X" went viral</p>
-                    <p className="text-sm text-muted-foreground">2M views</p>
-                  </div>
-                  <div className="ml-auto font-medium">Trending</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Ad Revenue Payout</p>
-                    <p className="text-sm text-muted-foreground">via Partner Program</p>
-                  </div>
-                  <div className="ml-auto font-medium text-primary">+$999.00</div>
-                </div>
-              </CardContent>
-            </Card>
+           <RecentActivity />
           </div>
         </div>
       </Animated>
