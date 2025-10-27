@@ -1,0 +1,154 @@
+/**
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict user-ownership model for user profiles, media, projects, and proposals.
+ *  Only authenticated users can create, read, update, or delete their own data.
+ *  The `website_updates` collection is publicly readable but write-protected, with updates only allowed if the
+ *  `userProfileId` matches the authenticated user's ID. This enables public display of updates while restricting
+ *  write access to authorized users.
+ *
+ * @dataStructure
+ * - /users/{userId}: Stores user profile data.
+ * - /users/{userId}/media/{mediaId}: Stores media files uploaded by users.
+ * - /users/{userId}/projects/{projectId}: Stores project data associated with users.
+ * - /users/{userId}/proposals/{proposalId}: Stores proposal data associated with users.
+ * - /website_updates/{websiteUpdateId}: Stores website update events.
+ *
+ * @keySecurityDecisions
+ * - User data is strictly isolated, preventing cross-user data access.
+ * - The `website_updates` collection is designed to be publicly readable to support live updates.
+ * - Data validation is relaxed to allow rapid prototyping. Only authorization-critical fields are validated.
+ *
+ * @denormalizationForAuthorization
+ * - The 'Media', 'Project', and 'Proposal' documents are stored as subcollections of `/users/{userProfileId}`.
+ *   This denormalization allows path-based rules to easily enforce user ownership without additional `get()` calls.
+ * - The `WebsiteUpdate` documents contain the `userProfileId` which is the owner of the updates.
+ *
+ * @structuralSegregation
+ * - User-specific private data is stored under the `/users/{userId}` path, while public website updates are stored in the
+ *   top-level `/website_updates` collection. This segregation prevents accidental exposure of private data.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Manages user profile data, ensuring only the owner can read, write, update, or delete their own profile.
+     * @path /users/{userProfileId}
+     * @allow (create) User with ID 'user123' can create a profile with 'id': 'user123'.
+     * @allow (get) User with ID 'user123' can read their profile.
+     * @allow (update) User with ID 'user123' can update their profile.
+     * @allow (delete) User with ID 'user123' can delete their profile.
+     * @deny (create) User with ID 'user456' cannot create a profile with 'id': 'user123'.
+     * @deny (get) User with ID 'user456' cannot read user 'user123' profile.
+     * @deny (update) User with ID 'user456' cannot update user 'user123' profile.
+     * @deny (delete) User with ID 'user456' cannot delete user 'user123' profile.
+     * @principle Enforces document ownership for all operations on user profiles.
+     */
+    match /users/{userProfileId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if false;
+      allow create: if isOwner(userProfileId) && request.resource.data.id == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.id == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.id == userProfileId;
+    }
+
+    /**
+     * @description Manages media files associated with a user, ensuring only the owner can create, read, update, or delete their own media.
+     * @path /users/{userProfileId}/media/{mediaId}
+     * @allow (create) User with ID 'user123' can create media under their profile.
+     * @allow (get) User with ID 'user123' can read media under their profile.
+     * @allow (update) User with ID 'user123' can update media under their profile.
+     * @allow (delete) User with ID 'user123' can delete media under their profile.
+     * @deny (create) User with ID 'user456' cannot create media under user 'user123' profile.
+     * @deny (get) User with ID 'user456' cannot read media under user 'user123' profile.
+     * @deny (update) User with ID 'user456' cannot update media under user 'user123' profile.
+     * @deny (delete) User with ID 'user456' cannot delete media under user 'user123' profile.
+     * @principle Enforces document ownership for all operations on media files.
+     */
+    match /users/{userProfileId}/media/{mediaId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+
+    /**
+     * @description Manages project data associated with a user, ensuring only the owner can create, read, update, or delete their own projects.
+     * @path /users/{userProfileId}/projects/{projectId}
+     * @allow (create) User with ID 'user123' can create a project under their profile.
+     * @allow (get) User with ID 'user123' can read a project under their profile.
+     * @allow (update) User with ID 'user123' can update a project under their profile.
+     * @allow (delete) User with ID 'user123' can delete a project under their profile.
+     * @deny (create) User with ID 'user456' cannot create a project under user 'user123' profile.
+     * @deny (get) User with ID 'user456' cannot read a project under user 'user123' profile.
+     * @deny (update) User with ID 'user456' cannot update a project under user 'user123' profile.
+     * @deny (delete) User with ID 'user456' cannot delete a project under user 'user123' profile.
+     * @principle Enforces document ownership for all operations on project data.
+     */
+    match /users/{userProfileId}/projects/{projectId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+
+    /**
+     * @description Manages proposal data associated with a user, ensuring only the owner can create, read, update, or delete their own proposals.
+     * @path /users/{userProfileId}/proposals/{proposalId}
+     * @allow (create) User with ID 'user123' can create a proposal under their profile.
+     * @allow (get) User with ID 'user123' can read a proposal under their profile.
+     * @allow (update) User with ID 'user123' can update a proposal under their profile.
+     * @allow (delete) User with ID 'user123' can delete a proposal under their profile.
+     * @deny (create) User with ID 'user456' cannot create a proposal under user 'user123' profile.
+     * @deny (get) User with ID 'user456' cannot read a proposal under user 'user123' profile.
+     * @deny (update) User with ID 'user456' cannot update a proposal under user 'user123' profile.
+     * @deny (delete) User with ID 'user456' cannot delete a proposal under user 'user123' profile.
+     * @principle Enforces document ownership for all operations on proposal data.
+     */
+    match /users/{userProfileId}/proposals/{proposalId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+
+    /**
+     * @description Manages website update events, allowing public read access but restricting write access to the owner of the update.
+     * @path /website_updates/{websiteUpdateId}
+     * @allow (get) Any user can read website updates.
+     * @allow (list) Any user can list website updates.
+     * @allow (create) User with ID 'user123' can create a website update with 'userProfileId': 'user123'.
+     * @allow (update) User with ID 'user123' can update a website update with 'userProfileId': 'user123'.
+     * @allow (delete) User with ID 'user123' can delete a website update with 'userProfileId': 'user123'.
+     * @deny (create) User with ID 'user456' cannot create a website update with 'userProfileId': 'user123'.
+     * @deny (update) User with ID 'user456' cannot update a website update with 'userProfileId': 'user123'.
+     * @deny (delete) User with ID 'user456' cannot delete a website update with 'userProfileId': 'user123'.
+     * @principle Allows public read access for website updates while enforcing ownership for write access.
+     */
+    match /website_updates/{websiteUpdateId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      allow get: if true;
+      allow list: if true;
+      allow create: if isOwner(request.resource.data.userProfileId);
+      allow update: if isOwner(resource.data.userProfileId) && resource != null;
+      allow delete: if isOwner(resource.data.userProfileId) && resource != null;
+    }
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's profile with their bio, achievements, visions, and projects.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user profile.",
+          "format": "uuid"
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short biography of the user."
+        },
+        "achievements": {
+          "type": "string",
+          "description": "A list of the user's achievements."
+        },
+        "visions": {
+          "type": "string",
+          "description": "The user's visions or goals."
+        },
+        "socialMediaLinks": {
+          "type": "string",
+          "description": "Links to the user's social media profiles.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Media": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Media",
+      "type": "object",
+      "description": "Represents a media file uploaded by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the media file.",
+          "format": "uuid"
+        },
+        "userProfileId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Media)"
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "URL of the media file.",
+          "format": "uri"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Date and time when the media was uploaded.",
+          "format": "date-time"
+        },
+        "watermarked": {
+          "type": "boolean",
+          "description": "Indicates whether the media has been watermarked."
+        }
+      },
+      "required": [
+        "id",
+        "userProfileId",
+        "fileUrl",
+        "uploadDate"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a project associated with a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the project.",
+          "format": "uuid"
+        },
+        "userProfileId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Project)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the project."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the project."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date of the project.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "End date of the project.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userProfileId",
+        "title",
+        "description",
+        "startDate"
+      ]
+    },
+    "Proposal": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Proposal",
+      "type": "object",
+      "description": "Represents a proposal associated with a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the proposal.",
+          "format": "uuid"
+        },
+        "userProfileId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Proposal)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the proposal."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the proposal."
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "Submission date of the proposal.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the proposal (e.g., pending, approved, rejected)."
+        }
+      },
+      "required": [
+        "id",
+        "userProfileId",
+        "title",
+        "description",
+        "submissionDate",
+        "status"
+      ]
+    },
+    "WebsiteUpdate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteUpdate",
+      "type": "object",
+      "description": "Represents an update event on the website, such as a new proposal, project, or picture being posted.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the website update event.",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Type of event (e.g., new_proposal, new_project, new_picture)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "ID of the entity associated with the event (e.g., Proposal ID, Project ID, Media ID)."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the event occurred.",
+          "format": "date-time"
+        },
+        "userProfileId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N WebsiteUpdate) - The user who triggered the update."
+        }
+      },
+      "required": [
+        "id",
+        "eventType",
+        "entityId",
+        "timestamp",
+        "userProfileId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userProfileId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile data. Top-level collection for user-related data.",
+          "params": [
+            {
+              "name": "userProfileId",
+              "description": "The unique identifier of the user profile."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userProfileId}/media/{mediaId}",
+        "definition": {
+          "entityName": "Media",
+          "schema": {
+            "$ref": "#/backend/entities/Media"
+          },
+          "description": "Stores media files uploaded by users. Includes denormalized 'userProfileId' for authorization independence.",
+          "params": [
+            {
+              "name": "userProfileId",
+              "description": "The unique identifier of the user profile."
+            },
+            {
+              "name": "mediaId",
+              "description": "The unique identifier of the media file."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userProfileId}/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores project data associated with users. Includes denormalized 'userProfileId' for authorization independence.",
+          "params": [
+            {
+              "name": "userProfileId",
+              "description": "The unique identifier of the user profile."
+            },
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userProfileId}/proposals/{proposalId}",
+        "definition": {
+          "entityName": "Proposal",
+          "schema": {
+            "$ref": "#/backend/entities/Proposal"
+          },
+          "description": "Stores proposal data associated with users. Includes denormalized 'userProfileId' for authorization independence.",
+          "params": [
+            {
+              "name": "userProfileId",
+              "description": "The unique identifier of the user profile."
+            },
+            {
+              "name": "proposalId",
+              "description": "The unique identifier of the proposal."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/website_updates/{websiteUpdateId}",
+        "definition": {
+          "entityName": "WebsiteUpdate",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteUpdate"
+          },
+          "description": "Stores website update events, such as new proposals, projects, or pictures being posted. Includes 'userProfileId', 'entityId', and 'eventType' to facilitate filtering and live updates.",
+          "params": [
+            {
+              "name": "websiteUpdateId",
+              "description": "The unique identifier of the website update event."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support live updates for proposals, projects, and pictures, leveraging the `WebsiteUpdate` collection as a central source of truth for changes. Each user has their own set of proposals, projects, and media, stored under their respective user ID. This design prioritizes authorization independence and supports efficient list operations. The `WebsiteUpdate` collection acts as a pub/sub mechanism, allowing the application to listen for new events and update the UI accordingly. This ensures that every document in a collection has the same security requirements.\n\nAuthorization Independence is achieved by storing each entity (Proposal, Project, Media) under the user's profile, enabling direct access control via path-based rules.  The `WebsiteUpdate` documents contain the `userProfileId` which is the owner of the updates.\n\nQAPs (Rules are not Filters) are supported by segregating user-specific data into subcollections under the `/users/{userId}` path, ensuring that listing operations can be securely scoped to a specific user's resources. The `WebsiteUpdate` collection, despite being global, contains sufficient metadata (`userProfileId`, `entityId`, `eventType`) to enable secure filtering and display of updates relevant to specific users or content types. The application can listen to changes in the `WebsiteUpdate` collection to immediately reflect new content on the website."
+  }
+}
