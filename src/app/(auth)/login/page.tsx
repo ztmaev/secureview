@@ -34,6 +34,14 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setGoogleLoading] = useState(false);
 
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   if (user) {
     router.push('/dashboard');
     return null;
@@ -43,6 +51,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
+      if (!auth) throw new Error('Auth service not available');
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/dashboard');
     } catch (error: any) {
@@ -59,6 +68,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
+      if (!auth) throw new Error('Auth service not available');
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
@@ -72,14 +82,6 @@ export default function LoginPage() {
       setGoogleLoading(false);
     }
   };
-
-  if (isUserLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <Card className="mx-auto max-w-sm w-full">

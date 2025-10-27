@@ -51,6 +51,7 @@ export default function SignupPage() {
     }
 
     try {
+      if (!auth) throw new Error('Auth service not available');
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -76,6 +77,7 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
     try {
+      if (!auth) throw new Error('Auth service not available');
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
