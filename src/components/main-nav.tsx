@@ -12,13 +12,14 @@ import {
 import { Logo } from '@/components/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare } from 'lucide-react';
+import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare, CreditCard } from 'lucide-react';
 
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: User },
   { href: '/analytics', label: 'Analytics', icon: BarChart2 },
   { href: '/upload', label: 'Content Manager', icon: Upload },
   { href: '/timeline', label: 'Timeline', icon: GanttChartSquare },
+  { href: '/pricing', label: 'Pricing', icon: CreditCard },
 ];
 
 const creationLinks = [

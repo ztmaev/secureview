@@ -20,6 +20,8 @@ function getPageTitle(pathname: string): string {
             return 'New Proposal';
         case '/timeline':
             return 'Timeline';
+        case '/pricing':
+            return 'Pricing';
         default:
             return 'SecureView';
     }
