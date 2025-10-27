@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { DollarSign, Eye, Users, TrendingUp, Bell } from 'lucide-react';
+import { DollarSign, Eye, Users, TrendingUp, Bell, Briefcase, FileText } from 'lucide-react';
 import { DashboardChart } from '@/components/dashboard-chart';
 import { Animated } from '@/components/ui/animated';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -41,10 +41,10 @@ const kpiData = [
   },
 ];
 
-const eventTypeToHumanReadable: { [key: string]: string } = {
-  new_proposal: 'New Proposal',
-  new_project: 'New Project',
-  new_picture: 'New Picture Uploaded'
+const eventTypeToHumanReadable: { [key: string]: {text: string, icon: React.ElementType} } = {
+  new_proposal: { text: 'New Proposal', icon: FileText },
+  new_project: { text: 'New Project', icon: Briefcase },
+  new_picture: { text: 'New Picture Uploaded', icon: Bell },
 }
 
 function RecentActivity() {
@@ -65,19 +65,23 @@ function RecentActivity() {
         {isLoading && <p>Loading activity...</p>}
         {error && <p className="text-destructive">Error loading activity.</p>}
         {updates && updates.length === 0 && <p className="text-muted-foreground">No recent activity.</p>}
-        {updates && updates.map((update) => (
-          <div key={update.id} className="flex items-center">
-            <div className="p-2 bg-accent rounded-full mr-4">
-              <Bell className="h-5 w-5 text-primary" />
+        {updates && updates.map((update) => {
+          const eventInfo = eventTypeToHumanReadable[update.eventType] || { text: 'New Update', icon: Bell };
+          const Icon = eventInfo.icon;
+          return (
+            <div key={update.id} className="flex items-center">
+              <div className="p-2 bg-accent rounded-full mr-4">
+                <Icon className="h-5 w-5 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium leading-none">{eventInfo.text}</p>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(update.timestamp).toLocaleTimeString()} - {new Date(update.timestamp).toLocaleDateString()}
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium leading-none">{eventTypeToHumanReadable[update.eventType] || 'New Update'}</p>
-              <p className="text-sm text-muted-foreground">
-                {new Date(update.timestamp).toLocaleTimeString()} - {new Date(update.timestamp).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </CardContent>
     </Card>
   )

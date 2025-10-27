@@ -12,12 +12,14 @@ import {
 import { Logo } from '@/components/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart2, User, Upload, Settings, LifeBuoy } from 'lucide-react';
+import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText } from 'lucide-react';
 
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: BarChart2 },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/upload', label: 'Content Manager', icon: Upload },
+  { href: '/projects', label: 'Projects', icon: Briefcase },
+  { href: '/proposals', label: 'Proposals', icon: FileText },
 ];
 
 export default function MainNav() {
@@ -35,9 +37,8 @@ export default function MainNav() {
         <SidebarMenu>
           {links.map(link => (
             <SidebarMenuItem key={link.href}>
-              <Link href={link.href} passHref>
+              <Link href={link.href}>
                 <SidebarMenuButton
-                  asChild
                   isActive={pathname === link.href}
                   tooltip={link.label}
                 >
