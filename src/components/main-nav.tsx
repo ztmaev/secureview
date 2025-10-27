@@ -12,14 +12,18 @@ import {
 import { Logo } from '@/components/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText } from 'lucide-react';
+import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare } from 'lucide-react';
 
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: BarChart2 },
   { href: '/profile', label: 'Profile', icon: User },
   { href: '/upload', label: 'Content Manager', icon: Upload },
-  { href: '/projects', label: 'Projects', icon: Briefcase },
-  { href: '/proposals', label: 'Proposals', icon: FileText },
+  { href: '/timeline', label: 'Timeline', icon: GanttChartSquare },
+];
+
+const creationLinks = [
+  { href: '/projects', label: 'New Project', icon: Briefcase },
+  { href: '/proposals', label: 'New Proposal', icon: FileText },
 ];
 
 export default function MainNav() {
@@ -33,9 +37,28 @@ export default function MainNav() {
             <h1 className="font-headline text-xl font-bold">SecureView</h1>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="flex-grow">
         <SidebarMenu>
           {links.map(link => (
+            <SidebarMenuItem key={link.href}>
+              <Link href={link.href}>
+                <SidebarMenuButton
+                  isActive={pathname === link.href}
+                  tooltip={link.label}
+                >
+                  <div>
+                    <link.icon className="size-5" />
+                    <span>{link.label}</span>
+                  </div>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+        <SidebarSeparator />
+        <SidebarMenu>
+            <p className="px-4 text-xs text-muted-foreground font-semibold uppercase mb-2 group-data-[collapsible=icon]:hidden">Create</p>
+          {creationLinks.map(link => (
             <SidebarMenuItem key={link.href}>
               <Link href={link.href}>
                 <SidebarMenuButton

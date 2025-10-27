@@ -13,9 +13,11 @@ function getPageTitle(pathname: string): string {
         case '/upload':
             return 'Content Manager';
         case '/projects':
-            return 'Projects';
+            return 'New Project';
         case '/proposals':
-            return 'Proposals';
+            return 'New Proposal';
+        case '/timeline':
+            return 'Timeline';
         default:
             return 'SecureView';
     }

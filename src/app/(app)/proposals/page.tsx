@@ -23,14 +23,19 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, FileText } from 'lucide-react';
+import { Loader2, FileText, CalendarIcon } from 'lucide-react';
 import { useFirebase } from '@/firebase';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { collection } from 'firebase/firestore';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Proposal title is required.'),
   description: z.string().min(1, 'Proposal description is required.'),
+  startDate: z.date({ required_error: 'A target date is required.' }),
 });
 
 export default function ProposalsPage() {
@@ -54,10 +59,13 @@ export default function ProposalsPage() {
         const updatesCollection = collection(firestore, 'website_updates');
         await addDocumentNonBlocking(updatesCollection, {
           eventType: 'new_proposal',
-          entityId: 'some-proposal-id', // Replace with actual ID after saving proposal
+          entityId: 'some-proposal-id', // This would be the real ID from a 'proposals' collection
           timestamp: new Date().toISOString(),
           userProfileId: user.uid,
-          ...values, // Storing title and description for display
+          title: values.title,
+          description: values.description,
+          startDate: values.startDate.toISOString(), // Proposals are treated as 'Upcoming'
+          endDate: null,
         });
 
         toast({
@@ -121,6 +129,44 @@ export default function ProposalsPage() {
                 </FormItem>
               )}
             />
+            <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Target Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-full pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             <Button type="submit" disabled={isLoading || !firestore} className="w-full">
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
