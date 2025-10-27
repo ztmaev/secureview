@@ -1,122 +1,152 @@
 'use client';
 
+import Image from 'next/image';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
+  CardFooter
 } from '@/components/ui/card';
-import { DollarSign, Eye, Users, TrendingUp, Bell, Briefcase, FileText } from 'lucide-react';
-import { DashboardChart } from '@/components/dashboard-chart';
-import { Animated } from '@/components/ui/animated';
-import { useCollection } from '@/firebase/firestore/use-collection';
-import { useMemoFirebase, useFirestore } from '@/firebase/provider';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Twitter, Linkedin, Instagram, Github } from 'lucide-react';
+import Link from 'next/link';
+import { MotionImage } from '@/components/ui/animated';
 
-const kpiData = [
-  {
-    title: 'Total Revenue',
-    value: '$45,231.89',
-    change: '+20.1% from last month',
-    icon: DollarSign,
-  },
-  {
-    title: 'Total Views',
-    value: '1,250,000',
-    change: '+180.1% from last month',
-    icon: Eye,
-  },
-  {
-    title: 'Engagement Rate',
-    value: '12.5%',
-    change: '+19% from last month',
-    icon: Users,
-  },
-  {
-    title: 'Sponsorship Value',
-    value: '$5,782',
-    change: '+5 since last month',
-    icon: TrendingUp,
-  },
+const socialLinks = [
+  { href: '#', icon: Twitter, label: 'Twitter' },
+  { href: '#', icon: Linkedin, label: 'LinkedIn' },
+  { href: '#', icon: Instagram, label: 'Instagram' },
+  { href: '#', icon: Github, label: 'GitHub' },
 ];
 
-const eventTypeToHumanReadable: { [key: string]: {text: string, icon: React.ElementType} } = {
-  new_proposal: { text: 'New Proposal', icon: FileText },
-  new_project: { text: 'New Project', icon: Briefcase },
-  new_picture: { text: 'New Picture Uploaded', icon: Bell },
-}
-
-function RecentActivity() {
-  const firestore = useFirestore();
-  const updatesQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'website_updates'), orderBy('timestamp', 'desc'), limit(5));
-  }, [firestore]);
-
-  const { data: updates, isLoading, error } = useCollection(updatesQuery);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline">Recent Activity</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        {isLoading && <p>Loading activity...</p>}
-        {error && <p className="text-destructive">Error loading activity.</p>}
-        {updates && updates.length === 0 && <p className="text-muted-foreground">No recent activity.</p>}
-        {updates && updates.map((update) => {
-          const eventInfo = eventTypeToHumanReadable[update.eventType] || { text: 'New Update', icon: Bell };
-          const Icon = eventInfo.icon;
-          return (
-            <div key={update.id} className="flex items-center">
-              <div className="p-2 bg-accent rounded-full mr-4">
-                <Icon className="h-5 w-5 text-primary" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">{eventInfo.text}</p>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(update.timestamp).toLocaleTimeString()} - {new Date(update.timestamp).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          )
-        })}
-      </CardContent>
-    </Card>
-  )
-}
-
-
 export default function DashboardPage() {
+  const avatar = PlaceHolderImages.find(p => p.id === 'profile-avatar');
+  const projects = PlaceHolderImages.filter(p => p.id.startsWith('project-'));
+  const media = PlaceHolderImages.filter(p => p.id.startsWith('media-'));
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpiData.map((kpi, index) => (
-          <Animated key={kpi.title} delay={index * 0.1}>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                <kpi.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{kpi.value}</div>
-                <p className="text-xs text-muted-foreground">{kpi.change}</p>
-              </CardContent>
-            </Card>
-          </Animated>
-        ))}
-      </div>
-      <Animated delay={0.4}>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
-          <div className="lg:col-span-5">
-            <DashboardChart />
+    <div className="space-y-8">
+      <Card>
+        <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
+          <Avatar className="h-24 w-24 border-2 border-primary">
+            {avatar && <AvatarImage src={avatar.imageUrl} alt="Profile" data-ai-hint={avatar.imageHint} />}
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <div className="text-center md:text-left">
+            <h1 className="text-3xl font-headline font-bold">Client Name</h1>
+            <p className="text-muted-foreground">Content Creator | Visionary | Innovator</p>
+            <div className="mt-4 flex justify-center md:justify-start gap-2">
+              {socialLinks.map(social => (
+                <Button key={social.label} variant="outline" size="icon" asChild>
+                  <Link href={social.href}>
+                    <social.icon className="h-4 w-4" />
+                    <span className="sr-only">{social.label}</span>
+                  </Link>
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="lg:col-span-2">
-           <RecentActivity />
-          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">Biography</CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground space-y-4">
+              <p>
+                Welcome to my digital space. I am a passionate creator dedicated to pushing the boundaries of digital media and storytelling. My work explores the intersection of technology, art, and human experience. 
+              </p>
+              <p>
+                With a background in visual arts and computer science, I strive to create engaging content that inspires and provokes thought. This platform serves as a central hub for all my projects, visions, and achievements.
+              </p>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">My Vision</CardTitle>
+            </CardHeader>
+            <CardContent className="text-muted-foreground">
+              <p>
+                My vision is to build a community around authentic and high-quality content, protected from unauthorized use. I believe in empowering creators by providing tools and platforms that respect their work and offer clear paths to monetization. SecureView is the first step towards this goal, ensuring that every piece of content is valued and secured.
+              </p>
+            </CardContent>
+          </Card>
         </div>
-      </Animated>
+        <div className="space-y-8">
+             <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Achievements</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="list-disc list-inside text-muted-foreground space-y-2">
+                        <li>Forbes 30 Under 30</li>
+                        <li>Digital Creator of the Year 2023</li>
+                        <li>1M+ Followers on Social Media</li>
+                        <li>Keynote Speaker at VidCon</li>
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-headline">Featured Projects</CardTitle>
+        </CardHeader>
+        <CardContent className="grid md:grid-cols-3 gap-4">
+          {projects.map(project => (
+            <div key={project.id} className="relative group overflow-hidden rounded-lg">
+                <MotionImage 
+                    src={project.imageUrl} 
+                    alt={project.description} 
+                    width={600} 
+                    height={400} 
+                    className="object-cover w-full h-full" 
+                    data-ai-hint={project.imageHint}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-white font-bold">{project.description}</p>
+                </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      
+       <Card>
+        <CardHeader>
+          <CardTitle className="font-headline">Media Gallery</CardTitle>
+          <CardDescription>All media is protected by SecureView.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {media.map(item => (
+            <div key={item.id} className="relative aspect-square group overflow-hidden rounded-lg">
+                <MotionImage 
+                  src={item.imageUrl} 
+                  alt={item.description} 
+                  width={400} 
+                  height={400} 
+                  className="object-cover w-full h-full" 
+                  data-ai-hint={item.imageHint}
+                  whileHover={{ scale: 1.05, filter: 'brightness(0.8)' }}
+                  transition={{ duration: 0.3 }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
+                     <p className="text-white text-xs font-semibold truncate">{item.description}</p>
+                </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

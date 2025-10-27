@@ -8,6 +8,8 @@ function getPageTitle(pathname: string): string {
     switch (pathname) {
         case '/dashboard':
             return 'Dashboard';
+        case '/analytics':
+            return 'Analytics';
         case '/profile':
             return 'Profile';
         case '/upload':

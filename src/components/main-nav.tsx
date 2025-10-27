@@ -15,8 +15,8 @@ import Link from 'next/link';
 import { BarChart2, User, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare } from 'lucide-react';
 
 const links = [
-  { href: '/dashboard', label: 'Dashboard', icon: BarChart2 },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/dashboard', label: 'Dashboard', icon: User },
+  { href: '/analytics', label: 'Analytics', icon: BarChart2 },
   { href: '/upload', label: 'Content Manager', icon: Upload },
   { href: '/timeline', label: 'Timeline', icon: GanttChartSquare },
 ];
