@@ -12,10 +12,12 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Check, Star, Gem, Crown } from 'lucide-react';
+import Link from 'next/link';
 
 const pricingTiers = [
   {
     name: 'Basic Access',
+    id: 'basic',
     price: '$9.99',
     period: 'monthly',
     description: 'Get access to our core library of watermarked content.',
@@ -29,6 +31,7 @@ const pricingTiers = [
   },
   {
     name: 'Premium',
+    id: 'premium',
     price: '$29.99',
     period: 'monthly',
     description: 'Download unwatermarked content and get premium features.',
@@ -44,6 +47,7 @@ const pricingTiers = [
   },
   {
     name: 'Enterprise',
+    id: 'enterprise',
     price: 'Contact Us',
     period: 'for custom pricing',
     description: 'Full access for large teams and commercial use.',
@@ -106,13 +110,21 @@ export default function PricingPage() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button
-                className="w-full"
-                variant={tier.popular ? 'default' : 'outline'}
-                onClick={() => handleSubscription(tier.name)}
-              >
-                {tier.buttonLabel}
-              </Button>
+              {tier.id === 'enterprise' ? (
+                 <Button className="w-full" asChild>
+                    <Link href="mailto:sales@secureview.com?subject=Enterprise%20Plan%20Inquiry">
+                      {tier.buttonLabel}
+                    </Link>
+                  </Button>
+              ) : (
+                <Button
+                    className="w-full"
+                    variant={tier.popular ? 'default' : 'outline'}
+                    onClick={() => handleSubscription(tier.name)}
+                >
+                    {tier.buttonLabel}
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}
