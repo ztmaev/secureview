@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/firebase/provider';
+import { useAuth, useUser } from '@/firebase/provider';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -27,6 +27,7 @@ import { Loader2 } from 'lucide-react';
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const { toast } = useToast();
 
   const [firstName, setFirstName] = useState('');
@@ -35,6 +36,20 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +77,7 @@ export default function SignupPage() {
           displayName: `${firstName} ${lastName}`,
         });
       }
-      router.push('/dashboard');
+      // The useEffect will handle the redirect
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -80,7 +95,7 @@ export default function SignupPage() {
       if (!auth) throw new Error('Auth service not available');
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      // The useEffect will handle the redirect
     } catch (error: any) {
       toast({
         variant: 'destructive',
