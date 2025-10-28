@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Check, Star, Gem, Crown } from 'lucide-react';
-import Link from 'next/link';
 
 const pricingTiers = [
   {
@@ -112,9 +111,9 @@ export default function PricingPage() {
             <CardFooter>
               {tier.id === 'enterprise' ? (
                  <Button className="w-full" asChild>
-                    <Link href="mailto:sales@secureview.com?subject=Enterprise%20Plan%20Inquiry">
+                    <a href="mailto:sales@secureview.com?subject=Enterprise%20Plan%20Inquiry">
                       {tier.buttonLabel}
-                    </Link>
+                    </a>
                   </Button>
               ) : (
                 <Button
