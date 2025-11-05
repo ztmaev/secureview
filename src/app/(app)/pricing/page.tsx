@@ -17,7 +17,7 @@ const pricingTiers = [
   {
     name: 'Basic Access',
     id: 'basic',
-    price: '$9.99',
+    price: 'KSh 1,299',
     period: 'monthly',
     description: 'Get access to our core library of watermarked content.',
     features: [
@@ -31,7 +31,7 @@ const pricingTiers = [
   {
     name: 'Premium',
     id: 'premium',
-    price: '$29.99',
+    price: 'KSh 3,899',
     period: 'monthly',
     description: 'Download unwatermarked content and get premium features.',
     features: [

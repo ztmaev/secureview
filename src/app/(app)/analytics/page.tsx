@@ -17,7 +17,7 @@ import { collection, query, orderBy, limit } from 'firebase/firestore';
 const kpiData = [
   {
     title: 'Total Revenue',
-    value: '$45,231.89',
+    value: 'KSh 5,880,147',
     change: '+20.1% from last month',
     icon: DollarSign,
   },
@@ -35,7 +35,7 @@ const kpiData = [
   },
   {
     title: 'Sponsorship Value',
-    value: '$5,782',
+    value: 'KSh 751,660',
     change: '+5 since last month',
     icon: TrendingUp,
   },
