@@ -1,0 +1,25 @@
+{
+  "projects": {
+    "default": "studio-6766352949-446a0"
+  },
+  "targets": {
+    "studio-6766352949-446a0": {
+      "hosting": {
+        "web": [
+          "secureview-main"
+        ]
+      },
+      "functions": {
+        "web": [
+          "secureview-main"
+        ]
+      }
+    }
+  },
+  "hosting": [
+    {
+      "target": "web",
+      "public": ".next/static"
+    }
+  ]
+}

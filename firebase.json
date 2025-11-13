@@ -1,0 +1,8 @@
+{
+  "database": {},
+  "firestore": {},
+  "storage": {},
+  "functions": {
+    "source": "functions" 
+  }
+}
