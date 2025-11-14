@@ -13,22 +13,34 @@ import { Logo } from '@/components/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { BarChart2, LayoutDashboard, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare, CreditCard } from 'lucide-react';
+// IMPORT THE USER HOOK: This is needed to check who is logged in
+import { useUser } from '@/firebase/provider'; 
 
+
+// Read the Admin ID from the environment variable (must be added to Vercel!)
+const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_USER_ID; 
+
+// 1. ADD: isRestricted property to control visibility
 const links = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/analytics', label: 'Analytics', icon: BarChart2 },
-  { href: '/upload', label: 'Content Manager', icon: Upload },
-  { href: '/timeline', label: 'Timeline', icon: GanttChartSquare },
-  { href: '/pricing', label: 'Pricing', icon: CreditCard },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, isRestricted: false },
+  { href: '/analytics', label: 'Analytics', icon: BarChart2, isRestricted: true },       // Restricted
+  { href: '/upload', label: 'Content Manager', icon: Upload, isRestricted: true },      // Restricted
+  { href: '/timeline', label: 'Timeline', icon: GanttChartSquare, isRestricted: false },
+  { href: '/pricing', label: 'Pricing', icon: CreditCard, isRestricted: false },
 ];
 
+// 2. ADD: isRestricted property to control visibility
 const creationLinks = [
-  { href: '/projects', label: 'New Project', icon: Briefcase },
-  { href: '/proposals', label: 'New Proposal', icon: FileText },
+  { href: '/projects', label: 'New Project', icon: Briefcase, isRestricted: true },     // Restricted
+  { href: '/proposals', label: 'New Proposal', icon: FileText, isRestricted: true },   // Restricted
 ];
 
 export default function MainNav() {
   const pathname = usePathname();
+  
+  // 3. GET USER AND CHECK ADMIN ROLE
+  const { user } = useUser();
+  const isAdmin = user && user.uid === ADMIN_UID; 
 
   return (
     <>
@@ -45,7 +57,10 @@ export default function MainNav() {
       
       <SidebarContent className="flex-grow px-3 py-4">
         <SidebarMenu className="space-y-1">
-          {links.map(link => (
+          {/* 4. APPLY FILTER to the main links: Show only public links OR if the user is Admin */}
+          {links
+            .filter(link => !link.isRestricted || isAdmin) 
+            .map(link => (
             <SidebarMenuItem key={link.href}>
               <Link href={link.href}>
                 <SidebarMenuButton
@@ -65,29 +80,36 @@ export default function MainNav() {
         
         <SidebarSeparator className="my-4" />
         
-        <div className="space-y-1">
-          <p className="px-3 text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-3 group-data-[collapsible=icon]:hidden">
-            Create
-          </p>
-          <SidebarMenu className="space-y-1">
-            {creationLinks.map(link => (
-              <SidebarMenuItem key={link.href}>
-                <Link href={link.href}>
-                  <SidebarMenuButton
-                    isActive={pathname === link.href}
-                    tooltip={link.label}
-                    className="group/item"
-                  >
-                    <div className="flex items-center gap-3">
-                      <link.icon className="h-5 w-5 transition-transform group-hover/item:scale-110" />
-                      <span className="font-medium">{link.label}</span>
-                    </div>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </div>
+        {/* 5. WRAP the entire 'Create' section in the isAdmin check */}
+        {isAdmin && (
+          <div className="space-y-1">
+            <p className="px-3 text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-3 group-data-[collapsible=icon]:hidden">
+              Create
+            </p>
+            <SidebarMenu className="space-y-1">
+              {/* 6. APPLY FILTER to the creation links */}
+              {creationLinks
+                .filter(link => !link.isRestricted || isAdmin) 
+                .map(link => (
+                  <SidebarMenuItem key={link.href}>
+                    <Link href={link.href}>
+                      <SidebarMenuButton
+                        isActive={pathname === link.href}
+                        tooltip={link.label}
+                        className="group/item"
+                      >
+                        <div className="flex items-center gap-3">
+                          <link.icon className="h-5 w-5 transition-transform group-hover/item:scale-110" />
+                          <span className="font-medium">{link.label}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </Link>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </div>
+        )}
+        
       </SidebarContent>
       
       <SidebarSeparator />
