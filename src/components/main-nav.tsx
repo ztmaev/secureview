@@ -20,25 +20,26 @@ import { useUser } from '@/firebase/provider';
 // Read the Admin ID from the environment variable (must be added to Vercel!)
 const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_USER_ID; 
 
-// 1. ADD: isRestricted property to control visibility
+// Navigation links - admin only links are restricted to the specified UID
 const links = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, isRestricted: false },
-  { href: '/analytics', label: 'Analytics', icon: BarChart2, isRestricted: true },       // Restricted
-  { href: '/upload', label: 'Content Manager', icon: Upload, isRestricted: true },      // Restricted
-  { href: '/timeline', label: 'Timeline', icon: GanttChartSquare, isRestricted: false },
-  { href: '/pricing', label: 'Pricing', icon: CreditCard, isRestricted: false },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart2, adminOnly: true },
+  { href: '/dashboard/upload', label: 'Content Manager', icon: Upload, adminOnly: true },
+  { href: '/dashboard/timeline', label: 'Timeline', icon: GanttChartSquare, adminOnly: false },
+  { href: '/dashboard/pricing', label: 'Pricing', icon: CreditCard, adminOnly: false },
+  { href: '/dashboard/profile', label: 'Profile', icon: LayoutDashboard, adminOnly: false },
 ];
 
-// 2. ADD: isRestricted property to control visibility
+// Creation links - admin only
 const creationLinks = [
-  { href: '/projects', label: 'New Project', icon: Briefcase, isRestricted: true },     // Restricted
-  { href: '/proposals', label: 'New Proposal', icon: FileText, isRestricted: true },   // Restricted
+  { href: '/dashboard/projects', label: 'New Project', icon: Briefcase, adminOnly: true },
+  { href: '/dashboard/proposals', label: 'New Proposal', icon: FileText, adminOnly: true },
 ];
 
 export default function MainNav() {
   const pathname = usePathname();
   
-  // 3. GET USER AND CHECK ADMIN ROLE
+  // GET USER AND CHECK ADMIN ROLE
   const { user } = useUser();
   const isAdmin = user && user.uid === ADMIN_UID; 
 
@@ -57,14 +58,14 @@ export default function MainNav() {
       
       <SidebarContent className="flex-grow px-3 py-4">
         <SidebarMenu className="space-y-1">
-          {/* 4. APPLY FILTER to the main links: Show only public links OR if the user is Admin */}
+          {/* Filter links: Show public links to everyone, admin links only to admin */}
           {links
-            .filter(link => !link.isRestricted || isAdmin) 
+            .filter(link => !link.adminOnly || isAdmin) 
             .map(link => (
             <SidebarMenuItem key={link.href}>
               <Link href={link.href}>
                 <SidebarMenuButton
-                  isActive={pathname === link.href}
+                  isActive={pathname === link.href || pathname.startsWith(link.href + '/')}
                   tooltip={link.label}
                   className="group/item"
                 >
@@ -80,21 +81,19 @@ export default function MainNav() {
         
         <SidebarSeparator className="my-4" />
         
-        {/* 5. WRAP the entire 'Create' section in the isAdmin check */}
+        {/* Show 'Create' section only to admin users */}
         {isAdmin && (
           <div className="space-y-1">
             <p className="px-3 text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-3 group-data-[collapsible=icon]:hidden">
               Create
             </p>
             <SidebarMenu className="space-y-1">
-              {/* 6. APPLY FILTER to the creation links */}
-              {creationLinks
-                .filter(link => !link.isRestricted || isAdmin) 
-                .map(link => (
+              {/* Creation links - only visible to admins */}
+              {creationLinks.map(link => (
                   <SidebarMenuItem key={link.href}>
                     <Link href={link.href}>
                       <SidebarMenuButton
-                        isActive={pathname === link.href}
+                        isActive={pathname === link.href || pathname.startsWith(link.href + '/')}
                         tooltip={link.label}
                         className="group/item"
                       >
