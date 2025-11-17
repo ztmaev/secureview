@@ -68,22 +68,27 @@ export default function SignupPage() {
 
     try {
       if (!auth) throw new Error('Auth service not available');
+      console.log('Attempting signup with email:', email);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
       if (userCredential.user) {
+        console.log('User created, updating profile');
         await updateProfile(userCredential.user, {
           displayName: `${firstName} ${lastName}`,
         });
+        console.log('Profile updated, redirecting to dashboard');
       }
+      router.push('/dashboard');
       // The useEffect will handle the redirect
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       });
     } finally {
       setIsLoading(false);
@@ -94,14 +99,18 @@ export default function SignupPage() {
     setGoogleLoading(true);
     try {
       if (!auth) throw new Error('Auth service not available');
+      console.log('Attempting Google signup');
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      console.log('Google signup successful, redirecting to dashboard');
+      router.push('/dashboard');
       // The useEffect will handle the redirect
     } catch (error: any) {
+      console.error('Google signup error:', error);
       toast({
         variant: 'destructive',
         title: 'Google Sign Up Failed',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       });
     } finally {
       setGoogleLoading(false);

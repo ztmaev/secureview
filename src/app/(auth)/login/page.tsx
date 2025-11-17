@@ -54,13 +54,16 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       if (!auth) throw new Error('Auth service not available');
+      console.log('Attempting login with email:', email);
       await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful, redirecting to dashboard');
       router.push('/dashboard');
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       });
     } finally {
       setIsLoading(false);
@@ -71,14 +74,17 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       if (!auth) throw new Error('Auth service not available');
+      console.log('Attempting Google login');
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      console.log('Google login successful, redirecting to dashboard');
       router.push('/dashboard');
     } catch (error: any) {
+      console.error('Google login error:', error);
       toast({
         variant: 'destructive',
         title: 'Google Login Failed',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       });
     } finally {
       setGoogleLoading(false);
