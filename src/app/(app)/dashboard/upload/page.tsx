@@ -27,6 +27,7 @@ import { Loader2, ShieldCheck, FileWarning } from 'lucide-react';
 import Image from 'next/image';
 import { useFirebase } from '@/firebase';
 import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { AdminOnly } from '@/components/admin-only';
 import { collection } from 'firebase/firestore';
 
 const formSchema = z.object({
@@ -128,95 +129,97 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Protect Your Content</CardTitle>
-          <CardDescription>
-            Upload an image and our AI will add a watermark to protect it from
-            unauthorized use.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="mediaFile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Media File</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={e => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="watermarkText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Watermark Text</FormLabel>
-                    <FormControl>
-                      <Input placeholder="© Your Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading || !firestore} className="w-full">
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <ShieldCheck className="mr-2 h-4 w-4" />
-                )}
-                Protect Media
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+    <AdminOnly>
+      <div className="grid gap-8 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">Protect Your Content</CardTitle>
+            <CardDescription>
+              Upload an image and our AI will add a watermark to protect it from
+              unauthorized use.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="mediaFile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Media File</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={e => field.onChange(e.target.files)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="watermarkText"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Watermark Text</FormLabel>
+                      <FormControl>
+                        <Input placeholder="© Your Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isLoading || !firestore} className="w-full">
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                  )}
+                  Protect Media
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Preview</CardTitle>
-          <CardDescription>
-            The protected image will appear here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="min-h-80 flex items-center justify-center">
-            {isLoading && (
-                <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p>AI is adding your watermark...</p>
-                </div>
-            )}
-            {!isLoading && resultUri && (
-                <div className="space-y-4 w-full">
-                    <h3 className="font-semibold">Protected Image:</h3>
-                    <Image src={resultUri} alt="Watermarked media" width={500} height={500} className="rounded-lg object-contain w-full h-auto" />
-                </div>
-            )}
-             {!isLoading && !resultUri && originalUri && (
-                 <div className="flex flex-col items-center gap-4 text-destructive">
-                    <FileWarning className="h-12 w-12" />
-                    <p className="text-center">Processing failed. Please try a different file or check your watermark text.</p>
-                </div>
-            )}
-            {!isLoading && !resultUri && !originalUri && (
-                 <div className="flex flex-col items-center gap-4 text-muted-foreground">
-                    <ShieldCheck className="h-12 w-12" />
-                    <p>Awaiting media upload</p>
-                </div>
-            )}
-        </CardContent>
-      </Card>
-    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">Preview</CardTitle>
+            <CardDescription>
+              The protected image will appear here.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="min-h-80 flex items-center justify-center">
+              {isLoading && (
+                  <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                      <p>AI is adding your watermark...</p>
+                  </div>
+              )}
+              {!isLoading && resultUri && (
+                  <div className="space-y-4 w-full">
+                      <h3 className="font-semibold">Protected Image:</h3>
+                      <Image src={resultUri} alt="Watermarked media" width={500} height={500} className="rounded-lg object-contain w-full h-auto" />
+                  </div>
+              )}
+               {!isLoading && !resultUri && originalUri && (
+                   <div className="flex flex-col items-center gap-4 text-destructive">
+                      <FileWarning className="h-12 w-12" />
+                      <p className="text-center">Processing failed. Please try a different file or check your watermark text.</p>
+                  </div>
+              )}
+              {!isLoading && !resultUri && !originalUri && (
+                   <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                      <ShieldCheck className="h-12 w-12" />
+                      <p>Awaiting media upload</p>
+                  </div>
+              )}
+          </CardContent>
+        </Card>
+      </div>
+    </AdminOnly>
   );
 }

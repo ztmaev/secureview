@@ -12,6 +12,7 @@ import { DashboardChart } from '@/components/dashboard-chart';
 import { Animated } from '@/components/ui/animated';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useMemoFirebase, useFirestore } from '@/firebase/provider';
+import { AdminOnly } from '@/components/admin-only';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 const kpiData = [
@@ -90,33 +91,35 @@ function RecentActivity() {
 
 export default function AnalyticsPage() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpiData.map((kpi, index) => (
-          <Animated key={kpi.title} delay={index * 0.1}>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                <kpi.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{kpi.value}</div>
-                <p className="text-xs text-muted-foreground">{kpi.change}</p>
-              </CardContent>
-            </Card>
-          </Animated>
-        ))}
-      </div>
-      <Animated delay={0.4}>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
-          <div className="lg:col-span-5">
-            <DashboardChart />
-          </div>
-          <div className="lg:col-span-2">
-           <RecentActivity />
-          </div>
+    <AdminOnly>
+      <div className="flex flex-col gap-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {kpiData.map((kpi, index) => (
+            <Animated key={kpi.title} delay={index * 0.1}>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+                  <kpi.icon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{kpi.value}</div>
+                  <p className="text-xs text-muted-foreground">{kpi.change}</p>
+                </CardContent>
+              </Card>
+            </Animated>
+          ))}
         </div>
-      </Animated>
-    </div>
+        <Animated delay={0.4}>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
+            <div className="lg:col-span-5">
+              <DashboardChart />
+            </div>
+            <div className="lg:col-span-2">
+             <RecentActivity />
+            </div>
+          </div>
+        </Animated>
+      </div>
+    </AdminOnly>
   );
 }
