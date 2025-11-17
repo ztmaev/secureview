@@ -63,7 +63,9 @@ export default function MainNav() {
             {ADMIN_UID === undefined && <span className="text-xs text-red-500 ml-2">(ENV VAR MISSING)</span>}
           </h1>
         </Link>
-      </SidebarHeader>      <SidebarContent className="flex-grow px-3 py-4">
+      </SidebarHeader>
+      
+      <SidebarContent className="flex-grow px-3 py-4">
         {/* Debug info - TEMPORARY FOR TESTING */}
         <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-xs border border-yellow-400">
           <p className="font-bold">⚙️ Debug:</p>
