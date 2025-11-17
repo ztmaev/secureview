@@ -20,6 +20,9 @@ import { useUser } from '@/firebase/provider';
 // Read the Admin ID from the environment variable (must be added to Vercel!)
 const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_USER_ID; 
 
+console.log('ADMIN_UID value:', ADMIN_UID);
+console.log('Type of ADMIN_UID:', typeof ADMIN_UID); 
+
 // Navigation links - admin only links are restricted to the specified UID
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
@@ -43,12 +46,15 @@ export default function MainNav() {
   const { user } = useUser();
   const isAdmin = user && user.uid === ADMIN_UID;
   
-  // Debug logging
-  console.log('=== MainNav Debug ===');
-  console.log('NEXT_PUBLIC_ADMIN_USER_ID env:', ADMIN_UID);
-  console.log('Current user UID:', user?.uid);
-  console.log('Is Admin:', isAdmin);
-  console.log('==================');
+  // Test if code is running
+  if (typeof window !== 'undefined') {
+    (window as any).RBAC_DEBUG = {
+      ADMIN_UID,
+      userUid: user?.uid,
+      isAdmin,
+      timestamp: new Date().toISOString()
+    };
+  }
 
   return (
     <>
