@@ -44,13 +44,11 @@ export default function MainNav() {
   const isAdmin = user && user.uid === ADMIN_UID;
   
   // Debug logging
-  if (typeof window !== 'undefined') {
-    console.log('MainNav Debug:', {
-      adminUidFromEnv: ADMIN_UID,
-      userUid: user?.uid,
-      isAdmin,
-    });
-  } 
+  console.log('=== MainNav Debug ===');
+  console.log('NEXT_PUBLIC_ADMIN_USER_ID env:', ADMIN_UID);
+  console.log('Current user UID:', user?.uid);
+  console.log('Is Admin:', isAdmin);
+  console.log('==================');
 
   return (
     <>
@@ -61,11 +59,19 @@ export default function MainNav() {
           </div>
           <h1 className="font-headline text-xl font-bold group-data-[collapsible=icon]:hidden">
             SecureView
+            {/* Debug indicator */}
+            {ADMIN_UID === undefined && <span className="text-xs text-red-500 ml-2">(ENV VAR MISSING)</span>}
           </h1>
         </Link>
-      </SidebarHeader>
-      
-      <SidebarContent className="flex-grow px-3 py-4">
+      </SidebarHeader>      <SidebarContent className="flex-grow px-3 py-4">
+        {/* Debug info - TEMPORARY FOR TESTING */}
+        <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-xs border border-yellow-400">
+          <p className="font-bold">⚙️ Debug:</p>
+          <p>Admin UID: {ADMIN_UID || '❌ NOT SET'}</p>
+          <p>Your UID: {user?.uid?.substring(0, 8)}...</p>
+          <p>Is Admin: {isAdmin ? '✅ YES' : '❌ NO'}</p>
+        </div>
+        
         <SidebarMenu className="space-y-1">
           {/* Filter links: Show public links to everyone, admin links only to admin */}
           {links
