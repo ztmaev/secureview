@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // These routes require admin access
 const ADMIN_ONLY_ROUTES = [
   '/dashboard/analytics',
-  '/dashboard/upload',
+  '/dashboard/content-manager',
   '/dashboard/projects',
   '/dashboard/proposals',
 ];

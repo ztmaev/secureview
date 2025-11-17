@@ -12,7 +12,7 @@ import {
 import { Logo } from '@/components/icons';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { BarChart2, LayoutDashboard, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Upload, Settings, LifeBuoy, Briefcase, FileText, GanttChartSquare, CreditCard } from 'lucide-react';
 import { useUser } from '@/firebase/provider'; 
 
 // Admin UID - this is hardcoded for now since env vars aren't working reliably
@@ -22,8 +22,7 @@ const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || '';
 // Navigation links
 const links = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart2, adminOnly: true },
-  { href: '/dashboard/upload', label: 'Content Manager', icon: Upload, adminOnly: true },
+  { href: '/dashboard/content-manager', label: 'Content Manager', icon: Upload, adminOnly: true },
   { href: '/dashboard/timeline', label: 'Timeline', icon: GanttChartSquare, adminOnly: false },
   { href: '/dashboard/pricing', label: 'Pricing', icon: CreditCard, adminOnly: false },
   { href: '/dashboard/profile', label: 'Profile', icon: LayoutDashboard, adminOnly: false },

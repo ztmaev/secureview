@@ -48,17 +48,27 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
     try {
       if (!auth) throw new Error('Auth service not available');
-      await sendPasswordResetEmail(auth, email);
+      console.log('Sending password reset email to:', email);
+      
+      // Build custom action URL
+      const actionCodeSettings = {
+        url: `${typeof window !== 'undefined' ? window.location.origin : ''}/login`,
+        handleCodeInApp: false,
+      };
+      
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
       setEmailSent(true);
+      console.log('Password reset email sent successfully');
       toast({
         title: 'Email Sent',
-        description: 'Check your inbox for password reset instructions.',
+        description: 'Check your inbox for password reset instructions. Email may take 1-2 minutes to arrive.',
       });
     } catch (error: any) {
+      console.error('Password reset error:', error);
       toast({
         variant: 'destructive',
         title: 'Reset Failed',
-        description: error.message || 'Failed to send reset email. Please try again.',
+        description: error.message || 'Failed to send reset email. Please make sure your email is registered.',
       });
     } finally {
       setIsLoading(false);
