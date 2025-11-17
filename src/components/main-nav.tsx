@@ -41,7 +41,16 @@ export default function MainNav() {
   
   // GET USER AND CHECK ADMIN ROLE
   const { user } = useUser();
-  const isAdmin = user && user.uid === ADMIN_UID; 
+  const isAdmin = user && user.uid === ADMIN_UID;
+  
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('MainNav Debug:', {
+      adminUidFromEnv: ADMIN_UID,
+      userUid: user?.uid,
+      isAdmin,
+    });
+  } 
 
   return (
     <>
